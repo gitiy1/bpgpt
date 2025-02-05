@@ -28,9 +28,11 @@ public class MyBurpExtension implements BurpExtension, PropertyChangeListener {
     MontoyaApi montoyaApi;
 
     @Getter
+    private String apiEndpoint = "https://api.openai.com/v1/completions";
+    @Getter
     private String apiKey = "PLEASE_CHANGE_ME_OR_YOU_WILL_MAKE_THE_DEVELOPER_SAD";
     @Getter
-    List<String> modelIds = Arrays.asList("davinci", "ada", "babbage", "curie");
+    List<String> modelIds = Arrays.asList("deepseek-ai/DeepSeek-R1", "gpt-4o", "gpt-4o-mini", "o1-mini", "o3-mini");
     @Getter
     private int maxPromptSize = 1024;
     @Getter
@@ -57,7 +59,7 @@ public class MyBurpExtension implements BurpExtension, PropertyChangeListener {
         montoyaApi.extension().setName(EXTENSION);
         logging.logToOutput("[+] Extension loaded");
 
-        gptClient = new GPTClient(apiKey, model, prompt, logging);
+        gptClient = new GPTClient(apiEndpoint, apiKey, model, prompt, logging);
         MyScanCheck scanCheck = new MyScanCheck(gptClient, logging);
 
         Menu menu = MyMenu.createMenu(this);
@@ -76,28 +78,31 @@ public class MyBurpExtension implements BurpExtension, PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent evt) {
     }
 
-    public void updateSettings(String newApiKey, String newModelId, int newMaxPromptSize, String newPrompt) {
+    public void updateSettings(String newApiEndpoint, String newApiKey, String newModelId, int newMaxPromptSize, String newPrompt) {
         String[] newValues = {
-                newApiKey, newModelId, Integer.toString(newMaxPromptSize), newPrompt };
+                newApiEndpoint, newApiKey, newModelId, Integer.toString(newMaxPromptSize), newPrompt };
         String[] oldValues = {
-                this.apiKey, this.model, Integer.toString(this.maxPromptSize), this.prompt };
+                this.apiEndpoint, this.apiKey, this.model, Integer.toString(this.maxPromptSize), this.prompt };
 
+        this.apiEndpoint = newApiEndpoint;
         this.apiKey = newApiKey;
         this.model = newModelId;
         this.maxPromptSize = newMaxPromptSize;
         this.prompt = newPrompt;
 
-        this.gptClient.updateSettings(newApiKey, newModelId, newMaxPromptSize, newPrompt);
+        this.gptClient.updateSettings(newApiEndpoint, newApiKey, newModelId, newMaxPromptSize, newPrompt);
 
         propertyChangeSupport.firePropertyChange("settingsChanged", oldValues, newValues);
 
         if (MyBurpExtension.DEBUG) {
             logging.logToOutput("[*] Updated extension settings:");
-            logging.logToOutput(String.format("- apiKey: %s\n" +
-                    "- model: %s\n" +
-                    "- maxPromptSize: %s\n" +
-                    "- prompt: %s",
-                    newApiKey, newModelId, newMaxPromptSize, newPrompt));
+            logging.logToOutput(String.format("""
+- apiEndpoint: %s
+- apiKey: %s
+- model: %s
+- maxPromptSize: %s
+- prompt: %s""",
+                    newApiEndpoint, newApiKey, newModelId, newMaxPromptSize, newPrompt));
         }
     }
 }

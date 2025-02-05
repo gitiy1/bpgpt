@@ -26,6 +26,7 @@ public class SettingsView extends JPanel implements PropertyChangeListener {
 
     private MyBurpExtension myBurpExtension;
 
+    private JTextField apiEndpointField;
     private JTextField apiKeyField;
     private JComboBox<String> modelIdComboBox;
     private JSpinner maxPromptSizeField;
@@ -53,12 +54,20 @@ public class SettingsView extends JPanel implements PropertyChangeListener {
     }
 
     private void initComponents() {
-        createApiKeyField(0);
-        createModelIdComboBox(1);
-        createMaxPromptSizeField(2);
-        createPromptField(3);
-        createPromptDescriptionLabel(4);
-        createApplyButton(5);
+        createApiEndpointField(0);
+        createApiKeyField(1);
+        createModelIdComboBox(2);
+        createMaxPromptSizeField(3);
+        createPromptField(4);
+        createPromptDescriptionLabel(5);
+        createApplyButton(6);
+    }
+
+    private void createApiEndpointField(int y) {
+        JLabel ApiEndpointLabel = new JLabel("API Endpoint:");
+        apiEndpointField = new JTextField(myBurpExtension.getApiEndpoint(), 20);
+        add(ApiEndpointLabel, createGridBagConstraints(0, y));
+        add(apiEndpointField, createGridBagConstraints(1, y));
     }
 
     private void createApiKeyField(int y) {
@@ -112,19 +121,20 @@ public class SettingsView extends JPanel implements PropertyChangeListener {
     }
 
     private void applySettings() {
+        String newApiEndpoint = apiEndpointField.getText().trim();
         String newApiKey = apiKeyField.getText().trim();
         String newModelId = (String) modelIdComboBox.getSelectedItem();
         int newMaxPromptSize = (int) maxPromptSizeField.getValue();
         String newPromptText = promptField.getText().trim();
 
-        if (newApiKey.isEmpty() || newModelId.isEmpty() || newPromptText.isEmpty() || newMaxPromptSize <= 0) {
+        if (newApiEndpoint.isEmpty() || newApiKey.isEmpty() || newModelId.isEmpty() || newPromptText.isEmpty() || newMaxPromptSize <= 0) {
             JOptionPane.showMessageDialog(SettingsView.this,
                     "All fields are required and max prompt size must be greater than 0", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        myBurpExtension.updateSettings(newApiKey, newModelId, newMaxPromptSize, newPromptText);
+        myBurpExtension.updateSettings(newApiEndpoint, newApiKey, newModelId, newMaxPromptSize, newPromptText);
 
         if (onApplyButtonClickListener != null) {
             onApplyButtonClickListener.onApplyButtonClick();
@@ -147,10 +157,11 @@ public class SettingsView extends JPanel implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent evt) {
         if ("settingsChanged".equals(evt.getPropertyName())) {
             String[] newValues = (String[]) evt.getNewValue();
-            apiKeyField.setText(newValues[0]);
-            modelIdComboBox.setSelectedItem(newValues[1]);
-            maxPromptSizeField.setValue(Integer.parseInt(newValues[2]));
-            promptField.setText(newValues[3]);
+            apiEndpointField.setText(newValues[0]);
+            apiKeyField.setText(newValues[1]);
+            modelIdComboBox.setSelectedItem(newValues[2]);
+            maxPromptSizeField.setValue(Integer.parseInt(newValues[3]));
+            promptField.setText(newValues[4]);
         }
     }
 }
