@@ -32,9 +32,9 @@ public class MyBurpExtension implements BurpExtension, PropertyChangeListener {
     @Getter
     private String apiKey = "PLEASE_CHANGE_ME_OR_YOU_WILL_MAKE_THE_DEVELOPER_SAD";
     @Getter
-    List<String> modelIds = Arrays.asList("deepseek-ai/DeepSeek-R1", "gpt-4o", "gpt-4o-mini", "o1-mini", "o3-mini");
+    List<String> modelIds = Arrays.asList("deepseek-ai/DeepSeek-R1", "gpt-4o", "gpt-4o-mini", "o1-mini", "o3-mini", "gemini-2.0-flash", "gemini-2.0-flash-exp", "gemini-2.0-pro-exp-02-05", "gemini-2.0-flash-thinking-exp-01-21", "llama-3.3-70b-versatile", "llama3-70b-8192");
     @Getter
-    private int maxPromptSize = 1024;
+    private int maxPromptSize = 8192;
     @Getter
     private String model = modelIds.get(0);
     @Getter
